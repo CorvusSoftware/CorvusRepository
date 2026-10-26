@@ -90,7 +90,7 @@ def validate(payload):
 
 
 def main():
-    catalog = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("CorvusCore/CorvusCore.json")
+    catalog = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog/corvuscore.json")
     payload = json.loads(catalog.read_text(encoding="utf-8"))
     entries = validate(payload)
     print(f"OK: {len(entries)} verified schema entries (offline; asset bytes not fetched)")

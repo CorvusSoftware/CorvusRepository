@@ -9,7 +9,7 @@ Les métadonnées des moteurs téléchargeables par [CorvusRetro](https://github
 [![Catalogue](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml/badge.svg)](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-[Catalogue JSON](CorvusCore/CorvusCore.json) · [Moteurs CorvusCore](https://github.com/CorvusSoftware/CorvusCore) · [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
+[Catalogue JSON](catalog/corvuscore.json) · [Moteurs CorvusCore](https://github.com/CorvusSoftware/CorvusCore) · [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
 
 </div>
 
@@ -23,12 +23,12 @@ Les métadonnées des moteurs téléchargeables par [CorvusRetro](https://github
 | **CorvusGBC** | Game Boy Color | ARM64 · x86_64 |
 | **CorvusGBA** | Game Boy Advance (expérimental) | ARM64 · x86_64 |
 
-Le catalogue **[CorvusCore/CorvusCore.json](CorvusCore/CorvusCore.json)** contient six entrées au format 3 de CorvusAPI 0 : identifiant, version, architecture, bibliothèque, URL, taille et SHA-256 de chaque archive.
+Le catalogue **[catalog/corvuscore.json](catalog/corvuscore.json)** contient six entrées au format 3 de CorvusAPI 0 : identifiant, version, architecture, bibliothèque, URL, taille et SHA-256 de chaque archive.
 
 **Adresse publique du catalogue :**
 
 ```text
-https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/CorvusCore/CorvusCore.json
+https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/corvuscore.json
 ```
 
 Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.14.1** de la [release CorvusRetro v0.13.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.13.0). Ce dépôt ne contient pas les fichiers binaires : il fournit leurs références et les outils permettant de vérifier le catalogue.
@@ -36,8 +36,8 @@ Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.1
 ## Organisation
 
 ```text
-CorvusCore/
-  CorvusCore.json              Catalogue public
+catalog/
+  corvuscore.json             Catalogue public
 tools/
   validate_catalog.py        Validation du format et des origines
   check_release_assets.py    Vérification des releases GitHub
@@ -53,14 +53,14 @@ Les fichiers `README.md`, `AGENTS.md` et `LICENSE` sont conservés à la racine.
 Seul Python 3 est nécessaire pour les contrôles locaux :
 
 ```sh
-python3 -m tools.validate_catalog CorvusCore/CorvusCore.json
+python3 -m tools.validate_catalog catalog/corvuscore.json
 python3 -m unittest discover -s tools -p 'test_*.py' -v
 ```
 
 Pour comparer les tailles et les SHA-256 du catalogue aux **métadonnées des fichiers publiés sur GitHub Releases** (nécessite Internet) :
 
 ```sh
-python3 -m tools.check_release_assets CorvusCore/CorvusCore.json
+python3 -m tools.check_release_assets catalog/corvuscore.json
 ```
 
 La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml) exécute les vérifications hors réseau. Ces tests n'exécutent pas de moteurs et ne téléchargent pas les ZIP.
@@ -69,9 +69,9 @@ La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/val
 
 1. Compiler et tester les modules à partir d'une révision connue de CorvusCore et CorvusAPI.
 2. Publier les archives sur une **release immuable** et vérifier leurs tailles et empreintes sur les fichiers réellement publiés.
-3. Mettre à jour `CorvusCore/CorvusCore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
+3. Mettre à jour `catalog/corvuscore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
 
-**Un dossier par fournisseur :** pour proposer un autre catalogue, l'organisation prévue est `NomDuFournisseur/NomDuFournisseur.json`. Il doit faire l'objet d'une validation avant toute intégration. **Le téléchargeur actuel ne découvre pas automatiquement ces fichiers** : seul le catalogue CorvusCore est utilisé et les trois identifiants officiels sont autorisés.
+**Un dossier par fournisseur :** pour proposer un autre catalogue, l'organisation prévue est `catalog/nomducoeur.json`. Il doit faire l'objet d'une validation avant toute intégration. **Le téléchargeur actuel ne découvre pas automatiquement ces fichiers** : seul le catalogue CorvusCore est utilisé et les trois identifiants officiels sont autorisés.
 
 **Compatibilité :** les anciens catalogues de CorvusRetro ont été supprimés volontairement. Les anciens APK qui les téléchargeaient (notamment v0.13.0) ne peuvent plus rafraîchir les cœurs ; une nouvelle version du frontend est nécessaire.
 

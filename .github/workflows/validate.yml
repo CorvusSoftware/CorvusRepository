@@ -17,6 +17,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Validate core catalog
-        run: python3 -m tools.validate_catalog CorvusCore/CorvusCore.json
+        run: python3 -m tools.validate_catalog catalog/corvuscore.json
       - name: Test catalog validation
         run: python3 -m unittest discover -s tools -p 'test_*.py' -v

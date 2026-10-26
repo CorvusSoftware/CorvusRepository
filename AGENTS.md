@@ -7,7 +7,7 @@ distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
 
 ## Fichiers de référence
 
-- `CorvusCore/CorvusCore.json` : catalogue format 3, utilisé par le téléchargeur.
+- `catalog/corvuscore.json` : catalogue format 3, utilisé par le téléchargeur.
 - `tools/validate_catalog.py` : validation hors réseau du schéma et des origines.
 - `tools/check_release_assets.py` : contrôle manuel en ligne des métadonnées de releases.
 - `tools/test_catalog.py` : tests de régression du validateur.
@@ -28,7 +28,7 @@ distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
    CorvusCore distribués par le catalogue restent sous AGPL-3.0-only.
 5. Le mainteneur a demandé la suppression des anciens flux de CorvusRetro.
    Ne pas les réintroduire ni affirmer que les APK déjà distribués peuvent encore
-   rafraîchir leurs moteurs. La source active est CorvusCore/CorvusCore.json.
+   rafraîchir leurs moteurs. La source active est catalog/corvuscore.json.
 6. Préserver le schéma public du format 3. Pour un autre fournisseur, utiliser
    un dossier et un fichier à son nom (Fournisseur/Fournisseur.json), mais le
    client doit être explicitement adapté et testé avant d'y accéder.
@@ -36,9 +36,9 @@ distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
 ## Vérifier
 
 ```sh
-python3 -m tools.validate_catalog CorvusCore/CorvusCore.json
+python3 -m tools.validate_catalog catalog/corvuscore.json
 python3 -m unittest discover -s tools -p 'test_*.py' -v
-python3 -m tools.check_release_assets CorvusCore/CorvusCore.json
+python3 -m tools.check_release_assets catalog/corvuscore.json
 ```
 
 La troisième commande nécessite un accès réseau et vérifie les métadonnées des
