@@ -1,0 +1,22 @@
+name: Validate core catalog
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate published core metadata
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check format-3 catalog
+        run: python3 tools/validate_catalog.py cores-v3.json
+      - name: Run validator regressions
+        run: python3 -m unittest discover -s tests -v
