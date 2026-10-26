@@ -11,7 +11,7 @@
       "library_name": "libcorvus_gb.so",
       "size": 1796437,
       "sha256": "9b064e0d236ddc5aa9b63b401ab158b73571be21e423ff785ab6a4118e3e55c1",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGB-0.14.1-android-arm64-v8a.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGB-0.14.1-android-arm64-v8a.zip"
     },
     {
       "id": "corvus.gb",
@@ -23,7 +23,7 @@
       "library_name": "libcorvus_gb.so",
       "size": 1793329,
       "sha256": "e8c2f7c303ffa5e67b62a65a9118bd8524fc657d870c0b6149d82dca78d48648",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGB-0.14.1-android-x86_64.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGB-0.14.1-android-x86_64.zip"
     },
     {
       "id": "corvus.gbc",
@@ -35,7 +35,7 @@
       "library_name": "libcorvus_gbc.so",
       "size": 1796460,
       "sha256": "bbcd056ace8b97b96fb4a87a94c2f239d77d2f5e54cc3704f19acf9331e6a6d1",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGBC-0.14.1-android-arm64-v8a.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGBC-0.14.1-android-arm64-v8a.zip"
     },
     {
       "id": "corvus.gbc",
@@ -47,7 +47,7 @@
       "library_name": "libcorvus_gbc.so",
       "size": 1793342,
       "sha256": "d4ae808490abe1fb5d5e71d703c786ef01839c037cb39b0eebcdf64527a27924",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGBC-0.14.1-android-x86_64.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGBC-0.14.1-android-x86_64.zip"
     },
     {
       "id": "corvus.gba",
@@ -59,7 +59,7 @@
       "library_name": "libcorvus_gba.so",
       "size": 1796480,
       "sha256": "3bcde508ae313ac76ca4e1edbb373158937863c8706c52a3a58d65e09c10a1aa",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGBA-0.14.1-android-arm64-v8a.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGBA-0.14.1-android-arm64-v8a.zip"
     },
     {
       "id": "corvus.gba",
@@ -71,7 +71,7 @@
       "library_name": "libcorvus_gba.so",
       "size": 1793360,
       "sha256": "fdf52c9b9da415d1463cdf20155ce624f80d277165d69207b9bf2a0edba9a763",
-      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.13.0/CorvusGBA-0.14.1-android-x86_64.zip"
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRetro/releases/download/v0.14.0/CorvusGBA-0.14.1-android-x86_64.zip"
     }
   ]
 }
