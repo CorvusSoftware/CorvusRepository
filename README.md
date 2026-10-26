@@ -9,7 +9,7 @@ Les métadonnées des moteurs téléchargeables par [CorvusRetro](https://github
 [![Catalogue](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml/badge.svg)](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-[Catalogue JSON](catalog/cores-v3.json) · [Moteurs CorvusCore](https://github.com/CorvusSoftware/CorvusCore) · [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
+[Catalogue JSON](CorvusCore/CorvusCore.json) · [Moteurs CorvusCore](https://github.com/CorvusSoftware/CorvusCore) · [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
 
 </div>
 
@@ -23,12 +23,12 @@ Les métadonnées des moteurs téléchargeables par [CorvusRetro](https://github
 | **CorvusGBC** | Game Boy Color | ARM64 · x86_64 |
 | **CorvusGBA** | Game Boy Advance (expérimental) | ARM64 · x86_64 |
 
-Le catalogue **[catalog/cores-v3.json](catalog/cores-v3.json)** contient six entrées au format 3 de CorvusAPI 0 : identifiant, version, architecture, bibliothèque, URL, taille et SHA-256 de chaque archive.
+Le catalogue **[CorvusCore/CorvusCore.json](CorvusCore/CorvusCore.json)** contient six entrées au format 3 de CorvusAPI 0 : identifiant, version, architecture, bibliothèque, URL, taille et SHA-256 de chaque archive.
 
 **Adresse publique du catalogue :**
 
 ```text
-https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/cores-v3.json
+https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/CorvusCore/CorvusCore.json
 ```
 
 Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.14.1** de la [release CorvusRetro v0.13.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.13.0). Ce dépôt ne contient pas les fichiers binaires : il fournit leurs références et les outils permettant de vérifier le catalogue.
@@ -36,8 +36,8 @@ Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.1
 ## Organisation
 
 ```text
-catalog/
-  cores-v3.json              Catalogue public
+CorvusCore/
+  CorvusCore.json              Catalogue public
 tools/
   validate_catalog.py        Validation du format et des origines
   check_release_assets.py    Vérification des releases GitHub
@@ -53,14 +53,14 @@ Les fichiers `README.md`, `AGENTS.md` et `LICENSE` sont conservés à la racine.
 Seul Python 3 est nécessaire pour les contrôles locaux :
 
 ```sh
-python3 -m tools.validate_catalog catalog/cores-v3.json
+python3 -m tools.validate_catalog CorvusCore/CorvusCore.json
 python3 -m unittest discover -s tools -p 'test_*.py' -v
 ```
 
 Pour comparer les tailles et les SHA-256 du catalogue aux **métadonnées des fichiers publiés sur GitHub Releases** (nécessite Internet) :
 
 ```sh
-python3 -m tools.check_release_assets catalog/cores-v3.json
+python3 -m tools.check_release_assets CorvusCore/CorvusCore.json
 ```
 
 La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml) exécute les vérifications hors réseau. Ces tests n'exécutent pas de moteurs et ne téléchargent pas les ZIP.
@@ -69,7 +69,7 @@ La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/val
 
 1. Compiler et tester les modules à partir d'une révision connue de CorvusCore et CorvusAPI.
 2. Publier les archives sur une **release immuable** et vérifier leurs tailles et empreintes sur les fichiers réellement publiés.
-3. Mettre à jour `catalog/cores-v3.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
+3. Mettre à jour `CorvusCore/CorvusCore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
 
 **Compatibilité :** les anciens APK de CorvusRetro utilisent toujours leurs catalogues historiques dans [CorvusRetro/core-repository](https://github.com/CorvusSoftware/CorvusRetro/tree/main/core-repository). Ne pas supprimer ou rediriger ces fichiers. L'intégration du nouveau chemin dans le frontend est préparée séparément ; un changement du catalogue ne met pas à jour les APK déjà publiés.
 

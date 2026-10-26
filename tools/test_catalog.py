@@ -10,7 +10,7 @@ from pathlib import Path
 
 from tools.validate_catalog import validate
 
-CATALOG = Path(__file__).resolve().parents[1] / "catalog" / "cores-v3.json"
+CATALOG = Path(__file__).resolve().parents[1] / "CorvusCore" / "CorvusCore.json"
 
 
 class CatalogTests(unittest.TestCase):
