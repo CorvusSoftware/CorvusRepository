@@ -42,7 +42,7 @@ class CatalogTests(unittest.TestCase):
 
     def test_path_traversal(self):
         self.reject(lambda x: x["cores"][0].__setitem__(
-            "archive_url", x["cores"][0]["archive_url"].replace("/v0.13.0/", "/../")))
+            "archive_url", x["cores"][0]["archive_url"].replace("/releases/download/", "/releases/download/../")))
 
     def test_mismatched_filename(self):
         self.reject(lambda x: x["cores"][0].__setitem__(
