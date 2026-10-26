@@ -1,25 +1,45 @@
-# Consignes pour les agents - CorvusRepository
+# CorvusRepository — consignes pour les agents
 
-Ce dépôt publie seulement le catalogue des modules CorvusAPI et ses outils
-de validation. Il n'est ni un moteur d'émulation, ni une copie de CorvusCore,
-ni le frontend Android CorvusRetro.
+Ce dépôt héberge **uniquement les métadonnées des cœurs**, la documentation de
+distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
+[CorvusCore](https://github.com/CorvusSoftware/CorvusCore), le frontend dans
+[CorvusRetro](https://github.com/CorvusSoftware/CorvusRetro).
 
-- `cores-v3.json` est le catalogue public du téléchargeur actuel. Ne changer
-  ni le schéma, ni les identifiants, ni les URL historiques sans migration
-  coordonnée de CorvusRetro.
-- Les empreintes et tailles doivent correspondre aux ZIP réels publiés sur
-  GitHub Releases ; ne jamais inventer des valeurs.
-- Conserver la liste de fournisseurs/URL autorisés et les limites de taille
-  dans `tools/validate_catalog.py` et ses tests.
-- Les bibliothèques distribuées restent sous leurs licences propres.
-  La licence MIT de ce dépôt ne s'applique pas automatiquement aux ZIP.
-- Aucune ROM commerciale, BIOS, secret, clé de signature, binaire téléchargé
-  ou code d'émulation dans ce dépôt.
-- Avant chaque modification du catalogue, lancer :
-  `python3 tools/validate_catalog.py cores-v3.json`
-  et `python3 -m unittest discover -s tests -v`.
-- Pour publier des mises à jour, lire `docs/PUBLISHING.md` ; conserver
-  les fichiers de release immuables et les anciennes URL accessibles.
-- Travailler par pull request pour les futures mises à jour de catalogue,
-  avec contrôle de la CI. Ne pas déclarer un asset vérifié si sa métadonnée
-  de release n'a pas été consultée.
+## Fichiers de référence
+
+- `catalog/cores-v3.json` : catalogue format 3, utilisé par le téléchargeur.
+- `tools/validate_catalog.py` : validation hors réseau du schéma et des origines.
+- `tools/check_release_assets.py` : contrôle manuel en ligne des métadonnées de releases.
+- `tools/test_catalog.py` : tests de régression du validateur.
+- `README.md` : présentation, commandes et procédure de publication.
+- `.github/workflows/validate.yml` : CI exécutant les vérifications hors réseau.
+
+## Contraintes
+
+1. Les six entrées actuelles ciblent les modules officiels GB, GBC et GBA pour
+   `arm64-v8a` et `x86_64`. Ne pas modifier leurs URL, tailles ou SHA-256
+   sans avoir contrôlé les véritables archives publiques.
+2. Garder les URL de release autorisées strictement bornées. Toute nouvelle
+   origine doit être prise en charge par le frontend et par les tests avant
+   une mise à jour du catalogue.
+3. Ne pas copier ici les moteurs, des ROMs, des BIOS, des APK, des clés,
+   des secrets, ni des archives natives.
+4. Le code et les métadonnées de ce dépôt sont sous MIT ; les modules
+   CorvusCore distribués par le catalogue restent sous AGPL-3.0-only.
+5. Conserver les anciennes URL des catalogues encore utilisées par
+   les versions publiées de CorvusRetro. Ne pas fusionner de bascule du
+   client avant une CI réussie.
+6. Préserver le schéma public du format 3 et mettre à jour les tests et
+   la documentation avec chaque évolution.
+
+## Vérifier
+
+```sh
+python3 -m tools.validate_catalog catalog/cores-v3.json
+python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 -m tools.check_release_assets catalog/cores-v3.json
+```
+
+La troisième commande nécessite un accès réseau et vérifie les métadonnées des
+assets GitHub. Elle ne télécharge pas les ZIP. Ne pas annoncer une vérification
+comme réussie sans l'avoir exécutée.

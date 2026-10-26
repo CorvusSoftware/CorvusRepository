@@ -42,7 +42,7 @@ def verify(catalog):
 
 if __name__ == "__main__":
     try:
-        path = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("cores-v3.json")
+        path = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog/cores-v3.json")
         count = verify(json.loads(path.read_text(encoding="utf-8")))
         print(f"OK: {count} GitHub release asset size/digest records match")
     except (OSError, ValueError, json.JSONDecodeError) as error:
