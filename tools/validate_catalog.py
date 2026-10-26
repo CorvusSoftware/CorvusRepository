@@ -85,7 +85,7 @@ def validate(payload, provider="corvuscore.json"):
         match = RELEASE.fullmatch(url.path)
         if (url.scheme != "https" or url.netloc != "github.com" or url.query or url.fragment
                 or match is None or match.group(1) not in ("CorvusRetro", "CorvusRepository")
-                or re.fullmatch(r"v[0-9]+\\.[0-9]+\\.[0-9]+", match.group(2)) is None):
+                or re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", match.group(2)) is None):
             raise ValueError("untrusted release URL")
         if provider == "corvuscore.json":
             expected_file = f"{name}-{version}-android-{abi}.zip"
