@@ -26,11 +26,12 @@ distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
    des secrets, ni des archives natives.
 4. Le code et les métadonnées de ce dépôt sont sous MIT ; les modules
    CorvusCore distribués par le catalogue restent sous AGPL-3.0-only.
-5. Conserver les anciennes URL des catalogues encore utilisées par
-   les versions publiées de CorvusRetro. Ne pas fusionner de bascule du
-   client avant une CI réussie.
-6. Préserver le schéma public du format 3 et mettre à jour les tests et
-   la documentation avec chaque évolution.
+5. Le mainteneur a demandé la suppression des anciens flux de CorvusRetro.
+   Ne pas les réintroduire ni affirmer que les APK déjà distribués peuvent encore
+   rafraîchir leurs moteurs. La source active est CorvusCore/CorvusCore.json.
+6. Préserver le schéma public du format 3. Pour un autre fournisseur, utiliser
+   un dossier et un fichier à son nom (Fournisseur/Fournisseur.json), mais le
+   client doit être explicitement adapté et testé avant d'y accéder.
 
 ## Vérifier
 

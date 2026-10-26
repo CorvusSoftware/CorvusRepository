@@ -71,7 +71,9 @@ La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/val
 2. Publier les archives sur une **release immuable** et vérifier leurs tailles et empreintes sur les fichiers réellement publiés.
 3. Mettre à jour `CorvusCore/CorvusCore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
 
-**Compatibilité :** les anciens APK de CorvusRetro utilisent toujours leurs catalogues historiques dans [CorvusRetro/core-repository](https://github.com/CorvusSoftware/CorvusRetro/tree/main/core-repository). Ne pas supprimer ou rediriger ces fichiers. L'intégration du nouveau chemin dans le frontend est préparée séparément ; un changement du catalogue ne met pas à jour les APK déjà publiés.
+**Un dossier par fournisseur :** pour proposer un autre catalogue, l'organisation prévue est `NomDuFournisseur/NomDuFournisseur.json`. Il doit faire l'objet d'une validation avant toute intégration. **Le téléchargeur actuel ne découvre pas automatiquement ces fichiers** : seul le catalogue CorvusCore est utilisé et les trois identifiants officiels sont autorisés.
+
+**Compatibilité :** les anciens catalogues de CorvusRetro ont été supprimés volontairement. Les anciens APK qui les téléchargeaient (notamment v0.13.0) ne peuvent plus rafraîchir les cœurs ; une nouvelle version du frontend est nécessaire.
 
 Les URL de ZIP restent actuellement hébergées dans les **releases CorvusRetro** et doivent conserver l'origine autorisée par son téléchargeur. Pour les héberger plus tard dans des releases CorvusRepository, il faudra d'abord adapter le frontend, sa liste d'origines autorisées et les tests.
 
