@@ -29,9 +29,11 @@ distribution et leurs validateurs. Les moteurs eux-mêmes résident dans
 5. Le mainteneur a demandé la suppression des anciens flux de CorvusRetro.
    Ne pas les réintroduire ni affirmer que les APK déjà distribués peuvent encore
    rafraîchir leurs moteurs. La source active est catalog/corvuscore.json.
-6. Préserver le schéma public du format 3. Pour un autre fournisseur, utiliser
-   un dossier et un fichier à son nom (Fournisseur/Fournisseur.json), mais le
-   client doit être explicitement adapté et testé avant d'y accéder.
+6. Tous les `catalog/*.json` sont découverts automatiquement par CorvusRetro via
+   l'API des contenus GitHub. Préserver le format 3 et un fichier par fournisseur,
+   sous le nom `catalog/fournisseur.json`. Le client valide chaque source avant
+   toute installation : revue du fournisseur, ID préfixé, SHA-256 et URL GitHub
+   Releases CorvusSoftware. Aucun index manuel n'est requis.
 
 ## Vérifier
 

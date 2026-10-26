@@ -71,7 +71,7 @@ La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/val
 2. Publier les archives sur une **release immuable** et vérifier leurs tailles et empreintes sur les fichiers réellement publiés.
 3. Mettre à jour `catalog/corvuscore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
 
-**Un dossier par fournisseur :** pour proposer un autre catalogue, l'organisation prévue est `catalog/nomducoeur.json`. Il doit faire l'objet d'une validation avant toute intégration. **Le téléchargeur actuel ne découvre pas automatiquement ces fichiers** : seul le catalogue CorvusCore est utilisé et les trois identifiants officiels sont autorisés.
+**Découverte automatique :** chaque fichier `catalog/<fournisseur>.json` ajouté à ce dossier est découvert via l'API publique des contenus GitHub. Aucun index manuel n'est nécessaire. Chaque fournisseur possède son espace de noms (`fournisseur.identifiant`) et doit passer la validation et la revue avant publication. Les catalogues utilisent le format 3, CorvusAPI 0 et des archives publiées dans les releases officielles **CorvusRetro** ou **CorvusRepository**. Les nouveaux cœurs proposés restent du **code natif exécutable** : aucune PR non vérifiée ne doit être fusionnée. L'ajout d'un JSON n'implique aucune approbation automatique de son contenu.
 
 **Compatibilité :** les anciens catalogues de CorvusRetro ont été supprimés volontairement. Les anciens APK qui les téléchargeaient (notamment v0.13.0) ne peuvent plus rafraîchir les cœurs ; une nouvelle version du frontend est nécessaire.
 
