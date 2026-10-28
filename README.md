@@ -31,7 +31,7 @@ Le catalogue **[catalog/corvuscore.json](catalog/corvuscore.json)** contient six
 https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/corvuscore.json
 ```
 
-Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.14.1** de la [release CorvusRetro v0.14.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.14.0). Ce dépôt ne contient pas les fichiers binaires : il fournit leurs références et les outils permettant de vérifier le catalogue.
+Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.15.0** de la [release CorvusRetro v0.18.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.18.0). Ce dépôt ne contient pas les fichiers binaires : il fournit leurs références et les outils permettant de vérifier le catalogue.
 
 ## Organisation
 
