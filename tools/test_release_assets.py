@@ -14,7 +14,7 @@ from unittest.mock import patch
 from tools.check_release_assets import verify, verify_path
 from tools.validate_catalog import release_asset
 
-CATALOG = Path(__file__).resolve().parents[1] / "catalog" / "corvuscore.json"
+CATALOG = Path(__file__).resolve().parents[1] / "catalog" / "v1" / "corvuscore.json"
 
 
 def release(entries, tag):

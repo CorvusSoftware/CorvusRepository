@@ -118,6 +118,12 @@ v0.18.0 : il s'agit d'un nouveau lot, sans écrasement ni copie annoncée à tor
 comme identique. Les ID, la version du moteur et les formats de sauvegarde
 restent inchangés. Les anciennes releases CorvusRetro restent accessibles.
 
-La version 0.18 de l'application accepte déjà les URL centrales. Aucune
-réinstallation d'APK n'est nécessaire pour consulter ce catalogue ou installer
-les nouveaux téléchargements. Un cœur 0.15.0 déjà installé continue à fonctionner.
+Le lot central est annoncé dans `catalog/v1/corvuscore.json`, découvert à partir
+de CorvusRetro 0.18.1. La version 0.18.0 refuse les URL centrales des cœurs
+officiels : son flux `catalog/corvuscore.json` conserve exactement les six
+références historiques CorvusRetro v0.18.0. Il faut mettre à jour ce client pour
+recevoir le flux central. Un cœur 0.15.0 déjà installé continue à fonctionner.
+
+La promotion automatique lit, valide et écrit uniquement `catalog/v1/`. Elle ne
+modifie jamais le flux historique. Après la mise à jour du client, les publications
+compatibles suivantes restent indépendantes de la construction de l'APK.

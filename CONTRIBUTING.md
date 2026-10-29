@@ -23,9 +23,11 @@ Les sources, les tests et les archives ne doivent contenir aucune ROM, BIOS prop
    et la provenance du commit/CI exacts. La publication CorvusRepository
    vérifie ces références, les octets, le contenu du ZIP et le module avant
    de les héberger dans ses propres releases.
-4. Après publication réelle, proposer le fichier `catalog/<fournisseur>.json` généré par les outils et faire passer la validation et la CI.
+4. Après publication réelle, proposer le fichier `catalog/v1/<fournisseur>.json` généré par les outils et faire passer la validation et la CI.
 
 Le mainteneur lance la publication des fournisseurs approuvés. Une pull request venant d'un fork ne reçoit aucun droit de publication ni secret. La validation d'un catalogue n'exécute jamais le code natif proposé.
+
+Le flux canonique est `catalog/v1/`, découvert à partir de CorvusRetro 0.18.1. Le fichier `catalog/corvuscore.json` conserve les archives historiques pour 0.18.0, qui refuse les nouvelles URL centrales officielles. Ne pas le modifier lors d'une contribution ou d'une promotion.
 
 ## Identité et catalogue
 
@@ -35,7 +37,7 @@ Conserver un identifiant lorsqu'un moteur est mis à jour. Il identifie notammen
 
 Chaque couple `(id, abi)` apparaît une seule fois dans les catalogues. Le champ `version` décrit la version du cœur ; il n'est pas lié à la version de CorvusRetro. Le tag d'une release CorvusRepository identifie un lot de distribution et doit être disponible et immuable.
 
-Le [contrat du catalogue](docs/catalog-format.md) détaille les champs et les limites. Ne pas ajouter d'exemple, de catalogue vide de démonstration ou de métadonnées provisoires dans `catalog/`, car ce dossier est découvert par les applications.
+Le [contrat du catalogue](docs/catalog-format.md) détaille les champs et les limites. Ne pas ajouter d'exemple, de catalogue vide de démonstration ou de métadonnées provisoires dans `catalog/v1/`, car ce dossier est découvert par les applications.
 
 ## Mise à jour d'un fournisseur existant
 
@@ -46,8 +48,10 @@ Générer les tailles et SHA-256 depuis les fichiers réels. Une URL prévue, un
 ## Vérifier sa contribution
 
 ```sh
+python3 -m tools.validate_catalog catalog/v1
 python3 -m tools.validate_catalog catalog
 python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 -m tools.check_release_assets catalog/v1
 python3 -m tools.check_release_assets catalog
 ```
 

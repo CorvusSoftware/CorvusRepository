@@ -129,7 +129,7 @@ def validate_directory(directory):
 
 
 def main():
-    target = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog")
+    target = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog/v1")
     if target.is_dir():
         count, entries = validate_directory(target)
         print(f"OK: {count} catalogs, {entries} core/ABI entries")

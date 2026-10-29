@@ -1,0 +1,77 @@
+{
+  "format": 3,
+  "cores": [
+    {
+      "id": "corvus.gb",
+      "name": "CorvusGB",
+      "description": "Game Boy",
+      "version": "0.15.0",
+      "abi": "arm64-v8a",
+      "api_version": 0,
+      "library_name": "libcorvus_gb.so",
+      "size": 1930063,
+      "sha256": "257477d8c89c72f79f5909cb78d58db66b3b784fdc767f5f4b6459ed97f427ca",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGB-0.15.0-android-arm64-v8a.zip"
+    },
+    {
+      "id": "corvus.gbc",
+      "name": "CorvusGBC",
+      "description": "Game Boy Color",
+      "version": "0.15.0",
+      "abi": "arm64-v8a",
+      "api_version": 0,
+      "library_name": "libcorvus_gbc.so",
+      "size": 1929542,
+      "sha256": "2d12d679d367afc6e536c77fad24ac2065c7c642c9867f602ad830cebd728ad1",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGBC-0.15.0-android-arm64-v8a.zip"
+    },
+    {
+      "id": "corvus.gba",
+      "name": "CorvusGBA",
+      "description": "Game Boy Advance",
+      "version": "0.15.0",
+      "abi": "arm64-v8a",
+      "api_version": 0,
+      "library_name": "libcorvus_gba.so",
+      "size": 1929954,
+      "sha256": "aa21a0775755e80a1478b4cdae048cd9f6439352617b40790cd4be15d2cda90f",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGBA-0.15.0-android-arm64-v8a.zip"
+    },
+    {
+      "id": "corvus.gb",
+      "name": "CorvusGB",
+      "description": "Game Boy",
+      "version": "0.15.0",
+      "abi": "x86_64",
+      "api_version": 0,
+      "library_name": "libcorvus_gb.so",
+      "size": 1913477,
+      "sha256": "bace3a460c37241ea8b6691760bde5e48253b2bfbd791f7dde8b085f858d6028",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGB-0.15.0-android-x86_64.zip"
+    },
+    {
+      "id": "corvus.gbc",
+      "name": "CorvusGBC",
+      "description": "Game Boy Color",
+      "version": "0.15.0",
+      "abi": "x86_64",
+      "api_version": 0,
+      "library_name": "libcorvus_gbc.so",
+      "size": 1913271,
+      "sha256": "435efd6620310eee7d3e6b1e94b8b70bff4df214ce8f17a455d9a470a13befa3",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGBC-0.15.0-android-x86_64.zip"
+    },
+    {
+      "id": "corvus.gba",
+      "name": "CorvusGBA",
+      "description": "Game Boy Advance",
+      "version": "0.15.0",
+      "abi": "x86_64",
+      "api_version": 0,
+      "library_name": "libcorvus_gba.so",
+      "size": 1913155,
+      "sha256": "c20865e4f262a9155db21cf0abe70a4330936a858d6480e9f72b1f6363eb27ce",
+      "archive_url": "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.1/CorvusGBA-0.15.0-android-x86_64.zip"
+    }
+  ]
+}
