@@ -40,7 +40,9 @@ L'adresse du catalogue officiel reste :
 https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/corvuscore.json
 ```
 
-Les six archives CorvusCore 0.15.0 précédemment distribuées par [CorvusRetro v0.18.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.18.0) constituent la provenance de la migration. Consulter les URL du [catalogue actif](catalog/corvuscore.json) pour leur emplacement publié ; une migration conserve les octets, les identifiants et les empreintes déjà qualifiés.
+Les six archives CorvusCore **0.15.0** sont désormais construites et hébergées ici, dans le [lot indépendant v0.15.1](https://github.com/CorvusSoftware/CorvusRepository/releases/tag/v0.15.1). Le numéro du lot n'est pas celui du moteur ou de l'APK. Le [workflow autonome qualifié](https://github.com/CorvusSoftware/CorvusRepository/actions/runs/40802383314) publie les sources exactes, empreintes et fichiers vérifiés ; aucun APK n'a été construit pour cette publication.
+
+Les archives historiques de [CorvusRetro v0.18.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.18.0) restent intactes. Les identifiants, la version du moteur et les formats de sauvegarde sont conservés ; les nouveaux téléchargements utilisent les fichiers qualifiés du catalogue actif.
 
 ## Publier une mise à jour
 
