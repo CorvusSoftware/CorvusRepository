@@ -67,7 +67,7 @@ def verify_path(path):
 
 if __name__ == "__main__":
     try:
-        path = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog")
+        path = Path(sys.argv[1]) if len(sys.argv) == 2 else Path("catalog/v1")
         count = verify_path(path)
         print(f"OK: {count} GitHub release asset size/digest records match")
     except (OSError, ValueError, json.JSONDecodeError) as error:

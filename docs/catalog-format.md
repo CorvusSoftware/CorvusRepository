@@ -1,6 +1,8 @@
 # Contrat des catalogues
 
-Un catalogue publié est un fichier `catalog/<fournisseur>.json`. Le format 3 reste compatible avec le téléchargeur CorvusRetro existant ; aucun index manuel ne doit être ajouté dans l'application.
+Un catalogue publié est un fichier `catalog/v1/<fournisseur>.json`. Le format 3 est découvert par CorvusRetro 0.18.1 et suivants dans ce dossier versionné ; aucun index manuel ne doit être ajouté dans l'application.
+
+Le fichier historique `catalog/corvuscore.json` reste inchangé pour CorvusRetro 0.18.0 et référence les six archives de CorvusRetro v0.18.0. Ce client refuse les URL centrales des cœurs officiels : il doit être mis à jour pour utiliser les catalogues `catalog/v1/`. Ne pas promouvoir de nouveau fournisseur ou de nouvelle version dans le dossier historique.
 
 ## Champs
 
@@ -27,7 +29,7 @@ Les limites actuelles sont 16 catalogues, 32 entrées cumulées et 96 Kio par fi
 
 ## Gabarit de travail
 
-Ce gabarit contient volontairement des valeurs à remplacer. Il ne constitue pas un catalogue valide et ne doit pas être déposé dans `catalog/` :
+Ce gabarit contient volontairement des valeurs à remplacer. Il ne constitue pas un catalogue valide et ne doit pas être déposé dans `catalog/v1/` :
 
 ```text
 {

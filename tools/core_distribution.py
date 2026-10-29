@@ -262,12 +262,12 @@ def asset_records(release, expected, tag, allow_draft=False):
 def promote_catalog(name, tag, catalog):
     """Prepare a review branch against live main. Never write the public branch."""
     base = api(f"repos/{REPOSITORY}/git/ref/heads/main")["object"]["sha"]
-    current = api(f"repos/{REPOSITORY}/contents/catalog?ref={base}")
+    current = api(f"repos/{REPOSITORY}/contents/catalog/v1?ref={base}")
     with tempfile.TemporaryDirectory() as temporary:
         directory = Path(temporary)
         for item in current:
             if item["name"].endswith(".json"):
-                blob = api(f"repos/{REPOSITORY}/contents/catalog/{item['name']}?ref={base}")
+                blob = api(f"repos/{REPOSITORY}/contents/catalog/v1/{item['name']}?ref={base}")
                 (directory / item["name"]).write_bytes(base64.b64decode(blob["content"]))
         (directory / (name + ".json")).write_text(json.dumps(catalog, indent=2) + "\n")
         validate_directory(directory)
@@ -275,14 +275,14 @@ def promote_catalog(name, tag, catalog):
     # Re-running an already-promoted lot needs no new branch or pull request.
     live = next((item for item in current if item["name"] == name + ".json"), None)
     if live:
-        blob = api(f"repos/{REPOSITORY}/contents/catalog/{name}.json?ref={base}")
+        blob = api(f"repos/{REPOSITORY}/contents/catalog/v1/{name}.json?ref={base}")
         if json.loads(base64.b64decode(blob["content"])) == catalog:
             return {"catalog": "already promoted"}
     branch = f"catalog/{name}-{tag}"
     refs = api(f"repos/{REPOSITORY}/git/matching-refs/heads/{branch}")
     exact = next((item for item in refs if item["ref"] == "refs/heads/" + branch), None)
     if exact:
-        blob = api(f"repos/{REPOSITORY}/contents/catalog/{name}.json?ref={branch}")
+        blob = api(f"repos/{REPOSITORY}/contents/catalog/v1/{name}.json?ref={branch}")
         if base64.b64decode(blob["content"]).decode() != body:
             raise ValueError("existing catalog branch differs; refusing to overwrite")
     else:
@@ -291,7 +291,7 @@ def promote_catalog(name, tag, catalog):
                   "content": base64.b64encode(body.encode()).decode()}
         if live:
             fields["sha"] = live["sha"]
-        api(f"repos/{REPOSITORY}/contents/catalog/{name}.json", **fields, _method="PUT")
+        api(f"repos/{REPOSITORY}/contents/catalog/v1/{name}.json", **fields, _method="PUT")
     # GITHUB_TOKEN-created pushes do not trigger CI automatically.
     gh("workflow", "run", "validate.yml", "--repo", REPOSITORY, "--ref", branch)
     prs = api(f"repos/{REPOSITORY}/pulls?head=CorvusSoftware:{branch}&base=main&state=open")

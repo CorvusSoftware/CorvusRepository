@@ -9,7 +9,7 @@ Les catalogues, les archives natives et leur publication évoluent séparément 
 [![Catalogue](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml/badge.svg)](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-[Catalogues](catalog/) · [Ajouter un cœur](CONTRIBUTING.md) · [Contrat CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
+[Catalogues](catalog/v1/) · [Ajouter un cœur](CONTRIBUTING.md) · [Contrat CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
 
 </div>
 
@@ -27,17 +27,17 @@ Une mise à jour de cœur ne nécessite pas de reconstruire, signer ou publier l
 
 | Catalogue | Moteurs | Architectures Android |
 | :--- | :--- | :--- |
-| [`catalog/corvuscore.json`](catalog/corvuscore.json) | CorvusGB, CorvusGBC, CorvusGBA expérimental | ARM64 et x86_64 |
-| `catalog/<fournisseur>.json` | Cœurs d'un fournisseur ajouté par contribution | Architecture(s) déclarée(s) et vérifiée(s) |
+| [`catalog/v1/corvuscore.json`](catalog/v1/corvuscore.json) | CorvusGB, CorvusGBC, CorvusGBA expérimental | ARM64 et x86_64 |
+| `catalog/v1/<fournisseur>.json` | Cœurs d'un fournisseur ajouté par contribution | Architecture(s) déclarée(s) et vérifiée(s) |
 
 Chaque fichier utilise le format 3 : identifiant permanent, nom, description, version du cœur, architecture, CorvusAPI 0, bibliothèque, URL de l'archive, taille et SHA-256. Les identifiants d'un autre fournisseur commencent par son propre préfixe, par exemple `atelier.handheld` dans `atelier.json` ; les identifiants officiels `corvus.gb`, `corvus.gbc` et `corvus.gba` sont réservés.
 
-CorvusRetro découvre automatiquement les fichiers `catalog/*.json` via l'API des contenus GitHub. Ajouter un fournisseur ne demande aucune modification d'une liste de fichiers dans l'application. Les archives approuvées sont centralisées dans les [releases CorvusRepository](https://github.com/CorvusSoftware/CorvusRepository/releases).
+CorvusRetro découvre automatiquement les fichiers `catalog/v1/*.json` via l'API des contenus GitHub. Ajouter un fournisseur ne demande aucune modification d'une liste de fichiers dans l'application. Les archives approuvées sont centralisées dans les [releases CorvusRepository](https://github.com/CorvusSoftware/CorvusRepository/releases).
 
-L'adresse du catalogue officiel reste :
+L'adresse du catalogue officiel pour CorvusRetro 0.18.1 et suivants est :
 
 ```text
-https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/corvuscore.json
+https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/v1/corvuscore.json
 ```
 
 Les six archives CorvusCore **0.15.0** sont désormais construites et hébergées ici, dans le [lot indépendant v0.15.1](https://github.com/CorvusSoftware/CorvusRepository/releases/tag/v0.15.1). Le numéro du lot n'est pas celui du moteur ou de l'APK. Le [workflow autonome qualifié](https://github.com/CorvusSoftware/CorvusRepository/actions/runs/40802383314) publie les sources exactes, empreintes et fichiers vérifiés ; aucun APK n'a été construit pour cette publication.
@@ -58,23 +58,28 @@ Voir le [guide de publication](docs/publication.md) et le [guide de contribution
 ## Vérifier
 
 ```sh
+python3 -m tools.validate_catalog catalog/v1
 python3 -m tools.validate_catalog catalog
 python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 -m tools.check_release_assets catalog/v1
 python3 -m tools.check_release_assets catalog
 ```
 
-Les deux premières commandes et la CI contrôlent les catalogues hors réseau. La troisième compare leurs références aux métadonnées des véritables releases GitHub ; elle ne télécharge ni n'exécute les bibliothèques. La publication vérifie aussi les octets téléchargés et le contenu des ZIP.
+La validation des deux dossiers, les tests et la CI contrôlent les catalogues hors réseau. Les commandes `check_release_assets` comparent leurs références aux métadonnées des véritables releases GitHub ; elles ne téléchargent ni n'exécutent les bibliothèques. La publication vérifie aussi les octets téléchargés et le contenu des ZIP.
 
 ## Compatibilité
 
-CorvusRetro 0.18 accepte déjà les releases CorvusRepository et les catalogues par fournisseur au format 3. Ses mises à jour de cœurs restent indépendantes de celles de l'application tant que le contrat CorvusAPI et les capacités du client restent compatibles. Les anciennes URL de releases CorvusRetro restent acceptées pour les archives historiques.
+CorvusRetro 0.18.0 refuse les archives officielles hébergées dans CorvusRepository malgré sa reconnaissance générale de cette origine. Son flux `catalog/corvuscore.json` est donc conservé à l'identique avec les six archives historiques de CorvusRetro v0.18.0.
+
+CorvusRetro 0.18.1 corrige ce contrôle et découvre `catalog/v1/*.json`. Ce chemin versionné fournit les archives centrales et les mises à jour indépendantes des fournisseurs. Il faut mettre à jour l'application pour recevoir ce flux. Les mises à jour suivantes des moteurs compatibles ne nécessitent pas de nouvel APK. Les promotions écrivent uniquement dans `catalog/v1/`, jamais dans le flux historique.
 
 Les anciens flux JSON de CorvusRetro ont été retirés volontairement. Les APK qui les utilisaient, notamment v0.13.0, ne peuvent pas retrouver les catalogues par cette migration ; ils doivent être mis à jour. Un cœur proposant une nouvelle API ou une fonctionnalité absente du frontend peut également nécessiter une mise à jour du client.
 
 ## Organisation
 
 ```text
-catalog/                     Un catalogue publié par fournisseur
+catalog/v1/                  Catalogues canoniques, un par fournisseur
+catalog/corvuscore.json       Flux historique pour CorvusRetro 0.18.0
 providers/                   Déclarations des fournisseurs approuvés
 tools/                      Validation et distribution des archives
 docs/                       Contribution et publication

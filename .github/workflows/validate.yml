@@ -16,7 +16,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - name: Validate core catalog
+      - name: Validate canonical catalogs
+        run: python3 -m tools.validate_catalog catalog/v1
+      - name: Validate legacy 0.18.0 catalog
         run: python3 -m tools.validate_catalog catalog
       - name: Validate approved provider declarations
         run: python3 -m tools.core_distribution validate-providers
