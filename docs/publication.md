@@ -103,8 +103,21 @@ Si un build ou une vérification échoue, conserver le catalogue public précéd
 
 Une annulation de catalogue peut rétablir les références précédentes sans supprimer les anciennes archives ni changer les ID des moteurs. Les sauvegardes des clients ne doivent pas être migrées par une opération de distribution.
 
-## Migration des archives historiques
+## Première publication autonome
 
-La migration initiale de CorvusCore 0.15.0 reprend les six archives déjà qualifiées dans CorvusRetro v0.18.0. Elle conserve exactement leurs octets, noms, versions et SHA-256, puis change uniquement l'emplacement d'hébergement après vérification de la copie publique.
+Le [lot v0.15.1](https://github.com/CorvusSoftware/CorvusRepository/releases/tag/v0.15.1)
+contient six nouvelles compilations autonomes de CorvusCore 0.15.0 depuis
+`063cf1f674788aa5913cebe184457a10b5946edd`, avec CorvusAPI
+`39c927c5a1a55b78ab55758a41cd16b0971c4684`. Le
+[workflow 40802383314](https://github.com/CorvusSoftware/CorvusRepository/actions/runs/40802383314)
+a construit et publié les modules sans APK, contrôlé leurs vrais octets publics
+puis préparé la branche de catalogue et sa CI explicite.
 
-Les futures publications peuvent être produites directement par CorvusRepository depuis les sources qualifiées. Les anciennes releases CorvusRetro restent accessibles afin de préserver les clients et les références historiques.
+Leurs SHA-256 diffèrent des anciennes compilations attachées à CorvusRetro
+v0.18.0 : il s'agit d'un nouveau lot, sans écrasement ni copie annoncée à tort
+comme identique. Les ID, la version du moteur et les formats de sauvegarde
+restent inchangés. Les anciennes releases CorvusRetro restent accessibles.
+
+La version 0.18 de l'application accepte déjà les URL centrales. Aucune
+réinstallation d'APK n'est nécessaire pour consulter ce catalogue ou installer
+les nouveaux téléchargements. Un cœur 0.15.0 déjà installé continue à fonctionner.
