@@ -144,6 +144,16 @@ class DistributionTests(unittest.TestCase):
                 dist.asset_records(dict(release, assets=[dict(item, **changes)]), expected, 'v1.0.0')
         with self.assertRaises(ValueError):
             dist.asset_records(dict(release, draft=True), expected, 'v1.0.0')
+        draft = dict(release, draft=True, assets=[dict(item, browser_download_url=
+            'https://github.com/'+dist.REPOSITORY+'/releases/download/untagged-abc123/Example.zip')])
+        self.assertEqual(set(dist.asset_records(draft, expected, 'v1.0.0', allow_draft=True)), {'Example.zip'})
+        with self.assertRaises(ValueError):
+            dist.asset_records(dict(draft, draft=False), expected, 'v1.0.0', allow_draft=True)
+        for address in ('https://github.com/Other/Repository/releases/download/untagged-abc123/Example.zip',
+                        'https://github.com/'+dist.REPOSITORY+'/releases/download/untagged-abc123/Other.zip'):
+            with self.assertRaises(ValueError):
+                dist.asset_records(dict(draft, assets=[dict(item, browser_download_url=address)]),
+                                   expected, 'v1.0.0', allow_draft=True)
 
     def test_no_promotion_when_public_bytes_differ(self):
         release = {'id': 123, 'tag_name': 'v1.0.0', 'draft': False, 'assets': []}

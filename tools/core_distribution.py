@@ -243,9 +243,17 @@ def asset_records(release, expected, tag, allow_draft=False):
         if name not in expected or name in found:
             raise ValueError("existing release has unexpected or duplicate assets")
         path = expected[name]
+        address = item.get("browser_download_url")
+        published_address = f"https://github.com/{REPOSITORY}/releases/download/{tag}/{name}"
+        # GitHub gives unpublished assets a temporary untagged-* path until
+        # the draft is published. The final public URL remains strict.
+        draft_address = (allow_draft and release.get("draft") is True
+                         and isinstance(address, str) and re.fullmatch(
+                             re.escape(f"https://github.com/{REPOSITORY}/releases/download/")
+                             + r"untagged-[a-f0-9]+/" + re.escape(name), address))
         if (item.get("size") != path.stat().st_size
                 or item.get("digest") != "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
-                or item.get("browser_download_url") != f"https://github.com/{REPOSITORY}/releases/download/{tag}/{name}"):
+                or (address != published_address and not draft_address)):
             raise ValueError("immutable release asset differs: " + name)
         found[name] = item
     return found
