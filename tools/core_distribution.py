@@ -319,8 +319,11 @@ def publish(name, tag, directory, catalog, provenance):
             gh("release", "create", tag, "--repo", REPOSITORY, "--target", revision, "--draft",
                "--title", f"Native core distribution {tag}", "--notes",
                f"Independent {name} distribution. Source: {provenance['repository']}@{provenance['source_sha']}. Core version: {provenance['version']}. See source.json and SHA256SUMS.")
-            existing = json.loads(gh("release", "view", tag, "--repo", REPOSITORY, "--json", "databaseId,isDraft"))
-            existing = api(f"repos/{REPOSITORY}/releases/{existing['databaseId']}")
+            detail = json.loads(gh("release", "view", tag, "--repo", REPOSITORY, "--json", "apiUrl"))
+            expected_api = f"https://api.github.com/repos/{REPOSITORY}/releases/"
+            if not isinstance(detail.get("apiUrl"), str) or not re.fullmatch(re.escape(expected_api) + r"[0-9]+", detail["apiUrl"]):
+                raise ValueError("unexpected draft release API address")
+            existing = api(detail["apiUrl"])
         found = asset_records(existing, expected, tag, allow_draft=True)
         missing = [path for filename, path in expected.items() if filename not in found]
         if missing:

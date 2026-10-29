@@ -170,6 +170,41 @@ class DistributionTests(unittest.TestCase):
             dist.api('repos/example/file', _method='PUT', content='YQ==')
         self.assertEqual(gh.call_args.args, ('api','repos/example/file','--method','PUT','-f','content=YQ=='))
 
+    def test_new_draft_uses_supported_cli_api_url_and_promotes_after_downloads(self):
+        release = {'id': 123, 'tag_name': 'v1.0.0', 'draft': True, 'assets': []}
+        expected = {}
+        events = []
+        def fake_api(endpoint, **fields):
+            return [] if endpoint.endswith('per_page=100') else release
+        def fake_records(r, files, tag, **kwargs):
+            expected.update(files)
+            return {} if not events else dict(files)
+        def fake_gh(*args):
+            if args[:2] == ('release', 'view'):
+                self.assertEqual(args[-1], 'apiUrl')
+                return json.dumps({'apiUrl': 'https://api.github.com/repos/'+dist.REPOSITORY+'/releases/123'})
+            if args[:2] == ('release', 'upload'):
+                events.append('upload')
+            if args[:2] == ('release', 'edit'):
+                release['draft'] = False
+            if args[:2] == ('release', 'download'):
+                filename = args[args.index('--pattern')+1]
+                target = Path(args[args.index('--dir')+1]) / filename
+                target.write_bytes(expected[filename].read_bytes())
+                events.append('download')
+            return ''
+        def fake_promote(*args):
+            self.assertEqual(events.count('download'), 3)
+            self.assertFalse(release['draft'])
+            return {'catalog': 'prepared'}
+        with patch.object(dist, 'validate_bundle', return_value=[self.entry]), \
+             patch.object(dist, 'qualified_repository', return_value='a'*40), \
+             patch.object(dist, 'api', side_effect=fake_api), \
+             patch.object(dist, 'asset_records', side_effect=fake_records), \
+             patch.object(dist, 'gh', side_effect=fake_gh), \
+             patch.object(dist, 'promote_catalog', side_effect=fake_promote):
+            dist.publish('example','v1.0.0',self.directory,{'cores':[self.entry]},self.source)
+
     def test_registry_rejects_unapproved_and_path_traversal(self):
         dist.provider('corvuscore')
         for name in ('../other', 'unknown', 'Example', 'corvuscore.json'):
