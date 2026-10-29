@@ -2,83 +2,87 @@
 
 # CorvusRepository
 
-**Catalogue officiel des cœurs CorvusSoftware.**
+**Distribution indépendante des cœurs CorvusAPI.**
 
-Les métadonnées des moteurs téléchargeables par [CorvusRetro](https://github.com/CorvusSoftware/CorvusRetro), indépendantes de l'application et des sources d'émulation.
+Les catalogues, les archives natives et leur publication évoluent séparément de l'application [CorvusRetro](https://github.com/CorvusSoftware/CorvusRetro).
 
 [![Catalogue](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml/badge.svg)](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml)
 [![Licence MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
-[Catalogue JSON](catalog/corvuscore.json) · [Moteurs CorvusCore](https://github.com/CorvusSoftware/CorvusCore) · [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
+[Catalogues](catalog/) · [Ajouter un cœur](CONTRIBUTING.md) · [Contrat CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI)
 
 </div>
 
----
+## Responsabilités
 
-## Catalogue
+| Projet | Responsabilité |
+| :--- | :--- |
+| **CorvusRepository** | Compiler ou importer les archives qualifiées, les publier dans ses propres releases, vérifier les fichiers publics et maintenir un catalogue par fournisseur. |
+| **CorvusCore ou un autre fournisseur** | Développer et tester ses moteurs, exposer CorvusAPI et fournir leurs sources et leur licence. |
+| **CorvusRetro** | Découvrir les catalogues et installer les modules vérifiés à la demande de l'utilisateur. |
 
-| Moteur | Console | Architectures Android |
+Une mise à jour de cœur ne nécessite pas de reconstruire, signer ou publier l'APK. La chaîne de distribution de ce dépôt ne dépend pas d'un build Gradle de CorvusRetro ni de sa clé de signature.
+
+## Catalogues et cœurs
+
+| Catalogue | Moteurs | Architectures Android |
 | :--- | :--- | :--- |
-| **CorvusGB** | Game Boy | ARM64 · x86_64 |
-| **CorvusGBC** | Game Boy Color | ARM64 · x86_64 |
-| **CorvusGBA** | Game Boy Advance (expérimental) | ARM64 · x86_64 |
+| [`catalog/corvuscore.json`](catalog/corvuscore.json) | CorvusGB, CorvusGBC, CorvusGBA expérimental | ARM64 et x86_64 |
+| `catalog/<fournisseur>.json` | Cœurs d'un fournisseur ajouté par contribution | Architecture(s) déclarée(s) et vérifiée(s) |
 
-Le catalogue **[catalog/corvuscore.json](catalog/corvuscore.json)** contient six entrées au format 3 de CorvusAPI 0 : identifiant, version, architecture, bibliothèque, URL, taille et SHA-256 de chaque archive.
+Chaque fichier utilise le format 3 : identifiant permanent, nom, description, version du cœur, architecture, CorvusAPI 0, bibliothèque, URL de l'archive, taille et SHA-256. Les identifiants d'un autre fournisseur commencent par son propre préfixe, par exemple `atelier.handheld` dans `atelier.json` ; les identifiants officiels `corvus.gb`, `corvus.gbc` et `corvus.gba` sont réservés.
 
-**Adresse publique du catalogue :**
+CorvusRetro découvre automatiquement les fichiers `catalog/*.json` via l'API des contenus GitHub. Ajouter un fournisseur ne demande aucune modification d'une liste de fichiers dans l'application. Les archives approuvées sont centralisées dans les [releases CorvusRepository](https://github.com/CorvusSoftware/CorvusRepository/releases).
+
+L'adresse du catalogue officiel reste :
 
 ```text
 https://raw.githubusercontent.com/CorvusSoftware/CorvusRepository/main/catalog/corvuscore.json
 ```
 
-Les archives actuellement référencées sont les ZIP officiels **CorvusCore 0.15.0** de la [release CorvusRetro v0.18.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.18.0). Ce dépôt ne contient pas les fichiers binaires : il fournit leurs références et les outils permettant de vérifier le catalogue.
+Les six archives CorvusCore 0.15.0 précédemment distribuées par [CorvusRetro v0.18.0](https://github.com/CorvusSoftware/CorvusRetro/releases/tag/v0.18.0) constituent la provenance de la migration. Consulter les URL du [catalogue actif](catalog/corvuscore.json) pour leur emplacement publié ; une migration conserve les octets, les identifiants et les empreintes déjà qualifiés.
+
+## Publier une mise à jour
+
+Deux parcours sont maintenus dans ce dépôt :
+
+- **CorvusCore** : construire les modules Android depuis une révision précise et qualifiée du fournisseur, sans construire CorvusRetro.
+- **Autre fournisseur** : importer les archives d'une release approuvée, vérifier leur contenu et les publier dans CorvusRepository.
+
+Dans les deux cas, les archives sont publiées avant de promouvoir leur catalogue. Le catalogue est généré avec les tailles et empreintes des fichiers réellement distribués. Les contrôles s'appliquent au fournisseur, à l'identité du cœur, à CorvusAPI, à l'ABI Android et à l'archive ; un JSON ajouté seul ne remplace pas la revue d'un nouveau moteur.
+
+Voir le [guide de publication](docs/publication.md) et le [guide de contribution](CONTRIBUTING.md). Le numéro d'un lot de distribution et la version d'un cœur sont indépendants de la version de l'APK. Un tag de release existant et ses archives ne sont pas réutilisés pour des octets différents.
+
+## Vérifier
+
+```sh
+python3 -m tools.validate_catalog catalog
+python3 -m unittest discover -s tools -p 'test_*.py' -v
+python3 -m tools.check_release_assets catalog
+```
+
+Les deux premières commandes et la CI contrôlent les catalogues hors réseau. La troisième compare leurs références aux métadonnées des véritables releases GitHub ; elle ne télécharge ni n'exécute les bibliothèques. La publication vérifie aussi les octets téléchargés et le contenu des ZIP.
+
+## Compatibilité
+
+CorvusRetro 0.18 accepte déjà les releases CorvusRepository et les catalogues par fournisseur au format 3. Ses mises à jour de cœurs restent indépendantes de celles de l'application tant que le contrat CorvusAPI et les capacités du client restent compatibles. Les anciennes URL de releases CorvusRetro restent acceptées pour les archives historiques.
+
+Les anciens flux JSON de CorvusRetro ont été retirés volontairement. Les APK qui les utilisaient, notamment v0.13.0, ne peuvent pas retrouver les catalogues par cette migration ; ils doivent être mis à jour. Un cœur proposant une nouvelle API ou une fonctionnalité absente du frontend peut également nécessiter une mise à jour du client.
 
 ## Organisation
 
 ```text
-catalog/
-  corvuscore.json             Catalogue public
-tools/
-  validate_catalog.py        Validation du format et des origines
-  check_release_assets.py    Vérification des releases GitHub
-  test_catalog.py            Tests du validateur
-.github/workflows/
-  validate.yml               Vérification automatique
+catalog/                     Un catalogue publié par fournisseur
+providers/                   Déclarations des fournisseurs approuvés
+tools/                      Validation et distribution des archives
+docs/                       Contribution et publication
+.github/workflows/           Validation et publication autonomes
 ```
 
-Les fichiers `README.md`, `AGENTS.md` et `LICENSE` sont conservés à la racine.
-
-## Vérification
-
-Seul Python 3 est nécessaire pour les contrôles locaux :
-
-```sh
-python3 -m tools.validate_catalog catalog/corvuscore.json
-python3 -m unittest discover -s tools -p 'test_*.py' -v
-```
-
-Pour comparer les tailles et les SHA-256 du catalogue aux **métadonnées des fichiers publiés sur GitHub Releases** (nécessite Internet) :
-
-```sh
-python3 -m tools.check_release_assets catalog/corvuscore.json
-```
-
-La [CI](https://github.com/CorvusSoftware/CorvusRepository/actions/workflows/validate.yml) exécute les vérifications hors réseau. Ces tests n'exécutent pas de moteurs et ne téléchargent pas les ZIP.
-
-## Publier une mise à jour
-
-1. Compiler et tester les modules à partir d'une révision connue de CorvusCore et CorvusAPI.
-2. Publier les archives sur une **release immuable** et vérifier leurs tailles et empreintes sur les fichiers réellement publiés.
-3. Mettre à jour `catalog/corvuscore.json`, lancer les vérifications ci-dessus et valider la CI avant de promouvoir le catalogue.
-
-**Découverte automatique :** chaque fichier `catalog/<fournisseur>.json` ajouté à ce dossier est découvert via l'API publique des contenus GitHub. Aucun index manuel n'est nécessaire. Chaque fournisseur possède son espace de noms (`fournisseur.identifiant`) et doit passer la validation et la revue avant publication. Les catalogues utilisent le format 3, CorvusAPI 0 et des archives publiées dans les releases officielles **CorvusRetro** ou **CorvusRepository**. Les nouveaux cœurs proposés restent du **code natif exécutable** : aucune PR non vérifiée ne doit être fusionnée. L'ajout d'un JSON n'implique aucune approbation automatique de son contenu.
-
-**Compatibilité :** les anciens catalogues de CorvusRetro ont été supprimés volontairement. Les anciens APK qui les téléchargeaient (notamment v0.13.0) ne peuvent plus rafraîchir les cœurs ; une nouvelle version du frontend est nécessaire.
-
-Les URL de ZIP restent actuellement hébergées dans les **releases CorvusRetro** et doivent conserver l'origine autorisée par son téléchargeur. Pour les héberger plus tard dans des releases CorvusRepository, il faudra d'abord adapter le frontend, sa liste d'origines autorisées et les tests.
+Les sources des moteurs résident chez leurs fournisseurs. Les ZIP et bibliothèques sont des assets de releases, jamais des fichiers binaires versionnés dans Git.
 
 ## Licence
 
-Les métadonnées, la documentation et les outils originaux de CorvusRepository sont publiés sous **[MIT](LICENSE)**, © 2026 CorvusSoftware.
+Les métadonnées, la documentation et les outils originaux de CorvusRepository sont sous **[MIT](LICENSE)**, © 2026 CorvusSoftware. Les bibliothèques conservent leur propre licence ; les modules officiels CorvusCore restent sous **AGPL-3.0-only** et le contrat CorvusAPI sous MIT.
 
-Les bibliothèques des moteurs [CorvusCore](https://github.com/CorvusSoftware/CorvusCore) restent sous **AGPL-3.0-only**. Le contrat [CorvusAPI](https://github.com/CorvusSoftware/CorvusAPI) conserve sa licence MIT. Ce dépôt ne redistribue ni ROM, ni BIOS commercial, ni clés de signature.
+Aucune ROM, aucun BIOS commercial, APK ou secret de signature n'est distribué par ce dépôt.

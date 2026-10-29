@@ -1,0 +1,114 @@
+# CorvusRepository - CorvusSoftware
+# Copyright (c) 2026 CorvusSoftware
+# SPDX-License-Identifier: MIT
+name: Import and publish approved provider
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: Reviewed provider ID from providers/ (except corvuscore)
+        required: true
+        type: string
+      upstream_tag:
+        description: Upstream release tag (vX.Y.Z)
+        required: true
+        type: string
+      release_tag:
+        description: Immutable CorvusRepository distribution tag (vX.Y.Z)
+        required: true
+        type: string
+      dry_run:
+        description: Verify and stage without publishing a release or catalog
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-distribution-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  import:
+    if: github.repository == 'CorvusSoftware/CorvusRepository' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    env:
+      PROVIDER_ID: ${{ inputs.provider }}
+      UPSTREAM_TAG: ${{ inputs.upstream_tag }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Check out reviewed distribution tooling
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Verify source CI and stage inspected upstream archives
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m tools.core_distribution import --provider "$PROVIDER_ID" \
+            --upstream-tag "$UPSTREAM_TAG" --tag "$RELEASE_TAG" \
+            --output-dir "$RUNNER_TEMP/provider-distribution" --dry-run
+
+      - name: Save verified bundle from this run
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: provider-distribution-${{ github.run_id }}
+          path: ${{ runner.temp }}/provider-distribution/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Describe staged publication
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          python3 - <<'PY'
+          import os
+          message = ('Dry run: verified native archives were staged without publication.'
+                     if os.environ['DRY_RUN'] == 'true' else
+                     'Verified archives are ready for the separate publication job and catalog review.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write(message + '\n')
+          PY
+
+  publish:
+    needs: import
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      PROVIDER_ID: ${{ inputs.provider }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Check out the same reviewed distribution revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Fetch only this run's verified bundle
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: provider-distribution-${{ github.run_id }}
+          path: ${{ runner.temp }}/provider-distribution
+
+      - name: Publish immutable assets and prepare reviewed catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m tools.core_distribution publish --provider "$PROVIDER_ID" --tag "$RELEASE_TAG" \
+            --input-dir "$RUNNER_TEMP/provider-distribution" \
+            --catalog "$RUNNER_TEMP/provider-distribution/catalog.json" \
+            --provenance "$RUNNER_TEMP/provider-distribution/source.json"

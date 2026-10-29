@@ -1,0 +1,10 @@
+{
+  "format": 1,
+  "id": "corvuscore",
+  "name": "CorvusSoftware",
+  "repository": "CorvusSoftware/CorvusCore",
+  "license": "AGPL-3.0-only",
+  "ci_workflow": "ci.yml",
+  "manifest_asset": "corvus-catalog.json",
+  "provenance_asset": "source.json"
+}
