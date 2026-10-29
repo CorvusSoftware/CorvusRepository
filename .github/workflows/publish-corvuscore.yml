@@ -1,0 +1,162 @@
+# CorvusRepository - CorvusSoftware
+# Copyright (c) 2026 CorvusSoftware
+# SPDX-License-Identifier: MIT
+name: Build and publish official CorvusCore
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Qualified full CorvusCore main commit
+        required: true
+        type: string
+        default: 063cf1f674788aa5913cebe184457a10b5946edd
+      release_tag:
+        description: Immutable CorvusRepository distribution tag
+        required: true
+        type: string
+        default: v0.15.0
+      dry_run:
+        description: Build qualification files without publishing a release or catalog
+        required: true
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: core-distribution-${{ inputs.release_tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: github.repository == 'CorvusSoftware/CorvusRepository' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    permissions:
+      contents: read
+      actions: read
+    env:
+      CORE_SOURCE_SHA: ${{ inputs.source_sha }}
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Check out distribution tooling
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+
+      - name: Validate immutable input identities
+        run: |
+          python3 - <<'PY'
+          import os
+          from tools.build_corvuscore import REVISION, TAG
+          if not REVISION.fullmatch(os.environ['CORE_SOURCE_SHA']):
+              raise SystemExit('source_sha must be a full lowercase commit')
+          if not TAG.fullmatch(os.environ['RELEASE_TAG']):
+              raise SystemExit('release_tag must be vX.Y.Z')
+          PY
+
+      - name: Require successful upstream CI for this exact source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/CorvusSoftware/CorvusCore/actions/workflows/ci.yml/runs?head_sha=$CORE_SOURCE_SHA&event=push&status=completed&per_page=100" > "$RUNNER_TEMP/core-ci.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          from tools.build_corvuscore import qualified_run
+          payload = json.loads((Path(os.environ['RUNNER_TEMP']) / 'core-ci.json').read_text())
+          run = qualified_run(payload, os.environ['CORE_SOURCE_SHA'])
+          with open(os.environ['GITHUB_ENV'], 'a') as output:
+              output.write('CORE_CI_RUN_ID=' + str(run) + '\n')
+          print('Qualified upstream source run', run)
+          PY
+
+      - name: Check out the qualified engines and public API
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: CorvusSoftware/CorvusCore
+          ref: ${{ inputs.source_sha }}
+          path: upstream-corvuscore
+          submodules: recursive
+          persist-credentials: false
+
+      - name: Install the pinned native Android toolchain
+        run: |
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/android-cli.zip" https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip
+          echo "7ec965280a073311c339e571cd5de778b9975026cfcbe79f2b1cdcb1e15317ee  $RUNNER_TEMP/android-cli.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/android-cli.zip" -d "$RUNNER_TEMP/android-cli"
+          python3 - <<'PY'
+          import os, subprocess
+          sdk = [os.environ['RUNNER_TEMP'] + '/android-cli/cmdline-tools/bin/sdkmanager',
+                 '--sdk_root=' + os.environ['ANDROID_HOME']]
+          subprocess.run(sdk + ['--licenses'], input='y\n' * 100, text=True, check=True)
+          subprocess.run(sdk + ['ndk;27.2.12479018', 'cmake;3.22.1'], check=True)
+          PY
+
+      - name: Build standalone native modules without an application checkout
+        run: |
+          python3 -m tools.build_corvuscore \
+            --source-dir "$GITHUB_WORKSPACE/upstream-corvuscore" \
+            --build-root "$RUNNER_TEMP/corvuscore-native" \
+            --output-dir "$RUNNER_TEMP/corvuscore-distribution" \
+            --ndk "$ANDROID_HOME/ndk/27.2.12479018" \
+            --cmake "$ANDROID_HOME/cmake/3.22.1/bin/cmake" \
+            --source-sha "$CORE_SOURCE_SHA" --repository-sha "$GITHUB_SHA" \
+            --release-tag "$RELEASE_TAG" --ci-run-id "$CORE_CI_RUN_ID" --run-id "$GITHUB_RUN_ID"
+
+      - name: Save native qualification and provenance
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: CorvusCore-${{ inputs.source_sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/corvuscore-distribution/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - name: Describe qualification mode
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          python3 - <<'PY'
+          import os
+          text = ('Dry run: six archives and provenance were built; no release or catalog was changed.'
+                  if os.environ['DRY_RUN'] == 'true' else
+                  'Six native archives are qualified. Publication runs separately, followed by a catalog review branch.')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
+              output.write(text + '\n')
+          PY
+
+  publish:
+    needs: build
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    env:
+      RELEASE_TAG: ${{ inputs.release_tag }}
+    steps:
+      - name: Check out the same distribution revision
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+
+      - name: Fetch this run's qualified native files
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: CorvusCore-${{ inputs.source_sha }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/corvuscore-distribution
+
+      - name: Publish immutable assets and prepare the reviewed catalog
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m tools.core_distribution publish --provider corvuscore --tag "$RELEASE_TAG" \
+            --input-dir "$RUNNER_TEMP/corvuscore-distribution" \
+            --catalog "$RUNNER_TEMP/corvuscore-distribution/catalog.json" \
+            --provenance "$RUNNER_TEMP/corvuscore-distribution/source.json"

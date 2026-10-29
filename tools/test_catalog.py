@@ -8,7 +8,7 @@ import json
 import unittest
 from pathlib import Path
 
-from tools.validate_catalog import validate
+from tools.validate_catalog import release_asset, validate
 
 CATALOG = Path(__file__).resolve().parents[1] / "catalog" / "corvuscore.json"
 
@@ -38,7 +38,36 @@ class CatalogTests(unittest.TestCase):
 
     def test_untrusted_repository(self):
         self.reject(lambda x: x["cores"][0].__setitem__(
-            "archive_url", x["cores"][0]["archive_url"].replace("CorvusRetro", "OtherRepo")))
+            "archive_url", x["cores"][0]["archive_url"].replace(
+                release_asset(x["cores"][0]["archive_url"])[0], "CorvusSoftware/OtherRepo")))
+
+    def test_official_archives_in_repository_and_legacy_releases(self):
+        for repository in ("CorvusRetro", "CorvusRepository"):
+            catalog = copy.deepcopy(self.catalog)
+            for entry in catalog["cores"]:
+                _, tag, filename = release_asset(entry["archive_url"])
+                entry["archive_url"] = (
+                    f"https://github.com/CorvusSoftware/{repository}/releases/download/{tag}/{filename}")
+            with self.subTest(repository=repository):
+                self.assertEqual(len(validate(catalog)), 6)
+
+    def test_release_asset_origin_and_route(self):
+        valid = "https://github.com/CorvusSoftware/CorvusRepository/releases/download/v0.15.0/core.zip"
+        self.assertEqual(release_asset(valid),
+                         ("CorvusSoftware/CorvusRepository", "v0.15.0", "core.zip"))
+        for invalid in (
+                valid.replace("https:", "http:"), valid + "?token=1", valid + "#fragment",
+                valid.replace("github.com", "github.com.evil.test"),
+                valid.replace("github.com", "user@github.com"),
+                valid.replace("CorvusSoftware", "AnotherOwner"),
+                valid.replace("CorvusRepository", "CorvusRepositoryExtra"),
+                valid.replace("v0.15.0", "corvuscore-v0.15.0"),
+                valid.replace("/core.zip", "/../core.zip"),
+                valid.replace("/core.zip", "/%63ore.zip"),
+                valid.replace("/core.zip", "/.hidden.zip"),
+                valid.replace("/core.zip", "/core\\file.zip")):
+            with self.subTest(address=invalid), self.assertRaises(ValueError):
+                release_asset(invalid)
 
     def test_path_traversal(self):
         self.reject(lambda x: x["cores"][0].__setitem__(

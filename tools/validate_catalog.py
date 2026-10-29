@@ -18,7 +18,6 @@ CORE_NAMES = {
 ABIS = {"arm64-v8a", "x86_64"}
 FIELDS = {"id", "name", "description", "version", "abi", "api_version",
           "library_name", "size", "sha256", "archive_url"}
-RELEASE_PREFIX = "/CorvusSoftware/CorvusRetro/releases/download/"
 MAX_ARCHIVE_SIZE = 32 * 1024 * 1024
 MAX_CATALOG_SIZE = 96 * 1024
 MAX_CATALOGS = 16
@@ -26,7 +25,20 @@ MAX_CORES = 32
 PROVIDER = re.compile(r"[a-z][a-z0-9_-]{0,39}\.json")
 CORE_ID = re.compile(r"[a-z][a-z0-9_-]{0,39}(?:\.[a-z0-9_-]{1,39})+")
 LIBRARY = re.compile(r"lib[a-z0-9_]{1,60}\.so")
-RELEASE = re.compile(r"/CorvusSoftware/([A-Za-z0-9_.-]+)/releases/download/([A-Za-z0-9._-]+)/([A-Za-z0-9._-]+\.zip)")
+RELEASE = re.compile(r"/CorvusSoftware/(CorvusRetro|CorvusRepository)/releases/download/(v[0-9]+\.[0-9]+\.[0-9]+)/([A-Za-z0-9][A-Za-z0-9._-]*\.zip)")
+
+
+def release_asset(address):
+    """Return the approved repository, release tag and exact asset filename."""
+    if (not isinstance(address, str) or len(address) > 256
+            or any(ord(c) <= 32 or ord(c) >= 127 or c in "\\%" for c in address)):
+        raise ValueError("invalid archive URL")
+    url = urlsplit(address)
+    match = RELEASE.fullmatch(url.path)
+    if (url.scheme != "https" or url.netloc != "github.com" or url.query or url.fragment
+            or match is None):
+        raise ValueError("untrusted release URL")
+    return "CorvusSoftware/" + match.group(1), match.group(2), match.group(3)
 
 
 def validate(payload, provider="corvuscore.json"):
@@ -77,19 +89,10 @@ def validate(payload, provider="corvuscore.json"):
         if not isinstance(digest, str) or not re.fullmatch(r"[a-f0-9]{64}", digest):
             raise ValueError("invalid archive checksum")
 
-        address = entry["archive_url"]
-        if (not isinstance(address, str) or len(address) > 256
-                or any(ord(c) <= 32 or ord(c) >= 127 or c in "\\%" for c in address)):
-            raise ValueError("invalid archive URL")
-        url = urlsplit(address)
-        match = RELEASE.fullmatch(url.path)
-        if (url.scheme != "https" or url.netloc != "github.com" or url.query or url.fragment
-                or match is None or match.group(1) not in ("CorvusRetro", "CorvusRepository")
-                or re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", match.group(2)) is None):
-            raise ValueError("untrusted release URL")
+        _, _, filename = release_asset(entry["archive_url"])
         if provider == "corvuscore.json":
             expected_file = f"{name}-{version}-android-{abi}.zip"
-            if match.group(1) != "CorvusRetro" or match.group(3) != expected_file:
+            if filename != expected_file:
                 raise ValueError("official release asset mismatch")
 
         key = (ident, abi)
