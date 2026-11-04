@@ -13,7 +13,7 @@ from unittest.mock import patch
 
 from tools.build_corvuscore import (ABIS, EXPORTS, SOURCE_REPOSITORY, check_cmake_version, configure_command,
                                    elf_layout, project_version, qualified_run,
-                                   verify_module, write_archive)
+                                   verify_module, write_archive, required_exports)
 
 SHA = "a" * 40
 
@@ -87,6 +87,29 @@ class CoreBuildTests(unittest.TestCase):
                 verify_module(module, "x86_64", Path("/llvm"))
             with patch("subprocess.check_output", side_effect=[symbols, "(NEEDED) Shared library: [libc++_shared.so]"]), self.assertRaises(ValueError):
                 verify_module(module, "x86_64", Path("/llvm"))
+
+    def test_cheats_export_required_from_0_16_at_native_build_gate(self):
+        old = EXPORTS
+        new = EXPORTS | {"corvus_get_cheats_api"}
+        self.assertEqual(required_exports("0.15.0"), old)
+        for version in ("0.16.0", "0.16.1", "0.17.0", "1.0.0"):
+            self.assertEqual(required_exports(version), new)
+        for invalid in (None, "0.16", "0.16.0-rc1"):
+            with self.assertRaises(ValueError):
+                required_exports(invalid)
+        with tempfile.TemporaryDirectory() as directory:
+            module = Path(directory) / "libcorvus_gb.so"
+            module.write_bytes(elf())
+            for version, exports, valid in (("0.15.0", old, True), ("0.16.0", old, False),
+                                            ("0.16.0", new, True)):
+                symbols = "\n".join("0000 T " + item for item in exports)
+                with self.subTest(version=version, valid=valid), patch("subprocess.check_output", side_effect=[
+                        symbols, "(NEEDED) Shared library: [libc.so]"]):
+                    if valid:
+                        self.assertEqual(verify_module(module, "x86_64", Path("/llvm"), version), elf())
+                    else:
+                        with self.assertRaises(ValueError):
+                            verify_module(module, "x86_64", Path("/llvm"), version)
 
     def test_archive_contains_one_exact_readonly_module(self):
         with tempfile.TemporaryDirectory() as directory:

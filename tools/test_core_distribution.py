@@ -74,6 +74,19 @@ class DistributionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     dist.validate_archive(self.path, self.entry)
 
+    def test_official_cheats_export_required_at_archive_promotion_gate(self):
+        self.entry["id"] = "corvus.gb"
+        old = dist.required_exports("0.15.0")
+        for version, exports, valid in (("0.15.0", old, True), ("0.16.0", old, False),
+                                        ("0.16.0", old | {"corvus_get_cheats_api"}, True)):
+            self.entry["version"] = version
+            with self.subTest(version=version, valid=valid), patch.object(dist, "module_symbols", return_value=exports):
+                if valid:
+                    dist.validate_archive(self.path, self.entry)
+                else:
+                    with self.assertRaises(ValueError):
+                        dist.validate_archive(self.path, self.entry)
+
     def test_zip_traversal_symlink_and_multiple_members(self):
         for name, mode, extra in (('../libexample.so', 0o100444, False),
                                   ('libexample.so', 0o120777, False),

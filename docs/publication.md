@@ -6,6 +6,12 @@ CorvusRepository possède les catalogues, les archives publiées et leur chaîne
 
 Le workflow `publish-corvuscore.yml` construit les modules directement depuis une révision exacte de CorvusCore. La révision doit avoir passé les contrôles du fournisseur et sa version doit correspondre à celle annoncée.
 
+À partir de CorvusCore 0.16.0, la qualification de compilation et celle des
+archives publiées exigent également le symbole `corvus_get_cheats_api`.
+Il reste optionnel dans le contrat public pour les anciens cœurs et les autres
+fournisseurs ; ce contrôle ne modifie pas le schéma du catalogue ni l’ABI de base.
+Les anciens lots officiels 0.15.x gardent leurs exigences précédentes.
+
 Le build utilise la chaîne Android native pour produire GB, GBC et GBA en ARM64 et x86_64. Il vérifie les bibliothèques et prépare six ZIP, leur provenance et le catalogue correspondant. Il n'embarque aucun moteur dans un APK et ne modifie pas CorvusRetro.
 
 ## Autre fournisseur
