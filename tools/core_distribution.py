@@ -16,7 +16,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from tools.build_corvuscore import elf_layout
+from tools.build_corvuscore import elf_layout, required_exports
 from tools.validate_catalog import (MAX_ARCHIVE_SIZE, MAX_CATALOG_SIZE,
                                     release_asset, validate, validate_directory)
 
@@ -191,9 +191,7 @@ def validate_archive(path, entry):
         data = archive.read(item)
     elf_layout(data, entry["abi"])
     exports = module_symbols(data)
-    if entry["id"].startswith("corvus.") and not {
-        "corvus_get_options_api", "corvus_get_subsystem_api", "corvus_get_achievements_api"
-    } <= exports:
+    if entry["id"].startswith("corvus.") and not required_exports(entry["version"]) <= exports:
         raise ValueError("official core lacks required optional interfaces")
 
 

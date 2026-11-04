@@ -83,12 +83,20 @@ def elf_layout(data, abi):
         raise ValueError("ELF has no loadable segment")
 
 
-def verify_module(module, abi, llvm):
+def required_exports(version):
+    if not isinstance(version, str) or re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version) is None:
+        raise ValueError("expected an official core version")
+    if tuple(map(int, version.split("."))) >= (0, 16, 0):
+        return EXPORTS | {"corvus_get_cheats_api"}
+    return EXPORTS
+
+
+def verify_module(module, abi, llvm, version="0.15.0"):
     data = module.read_bytes()
     elf_layout(data, abi)
     symbols = subprocess.check_output([str(llvm / "llvm-nm"), "-D", "--defined-only", str(module)], text=True)
     exported = {line.split()[-1] for line in symbols.splitlines() if line.split()}
-    if not EXPORTS <= exported:
+    if not required_exports(version) <= exported:
         raise ValueError("official module is missing a CorvusAPI extension export")
     dynamic = subprocess.check_output([str(llvm / "llvm-readelf"), "--dynamic", "--wide", str(module)], text=True)
     needed = set(re.findall(r"\(NEEDED\).*\[([^\]]+)\]", dynamic))
@@ -165,7 +173,7 @@ def build(args):
         subprocess.run([str(cmake), "--build", str(destination), "--parallel", str(args.parallel),
                         "--target", "corvus_gb", "corvus_gbc", "corvus_gba"], check=True)
         for ident, (name, library) in CORE_NAMES.items():
-            data = verify_module(destination / library, abi, llvm)
+            data = verify_module(destination / library, abi, llvm, version)
             archive = output / f"{name}-{version}-android-{abi}.zip"
             write_archive(archive, library, data)
             entries.append({"id": ident, "name": name, "description": {
